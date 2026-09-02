@@ -369,15 +369,6 @@
     font-size:10px; letter-spacing:2px; color:#8a8070; margin-top:8px;
     text-transform:uppercase;
   }
-  .player-hint{
-    margin-top:20px; font-size:11px; color:#8a8070; line-height:1.6;
-  }
-  .file-pick{
-    display:inline-block; margin-top:14px;
-    font-size:11px; letter-spacing:3px; text-transform:uppercase;
-    color:var(--blood-bright); cursor:pointer; border-bottom:1px solid var(--blood-bright);
-  }
-  .file-pick input{ display:none; }
 
   /* ---------- Footer ---------- */
   footer{
@@ -390,7 +381,7 @@
   }
   footer .big em{ color:var(--blood-bright); font-style:normal; }
 
-  /* ---------- MEDIA QUERIES PARA MÓVILES Y PANTALLAS PEQUEÑAS ---------- */
+  /* ---------- MEDIA QUERIES ---------- */
   @media (max-width: 768px) {
     nav {
       padding: 16px 20px;
@@ -410,7 +401,7 @@
       padding: 80px 6vw;
     }
     .letter {
-      transform: none; /* Elimina la inclinación en móviles para evitar scroll horizontal */
+      transform: none;
     }
   }
 
@@ -425,7 +416,7 @@
       gap: 8px;
     }
     .feature-frame {
-      aspect-ratio: 1/1; /* Cambia a formato cuadrado en pantallas muy estrechas */
+      aspect-ratio: 1/1;
     }
   }
 </style>
@@ -494,15 +485,15 @@
 
   <section id="cancion" class="player-section">
     <div class="player reveal">
-      <span class="kicker">Te dedico está canción</span>
-      <h2>Pon play</h2>
-      <p class="track-name" id="trackName">Puente</p>
+      <span class="kicker">Nuestra Canción</span>
+      <h2>Dale Play</h2>
+      <p class="track-name" id="trackName">Puente — Gustavo Cerati</p>
       
-      <!-- ESTRUCTURA DEL VINILO RESPONSIVO -->
+      <!-- VINILO CON IMAGEN CORREGIDA -->
       <div class="player-cover">
         <div class="vinyl-record" id="jukeboxImg">
           <div class="vinyl-center">
-            <img src="img/Bocanada.jpg" alt="Bocanada - Gustavo Cerati">
+            <img src="img/Bocanada.jpg" alt="Portada de la canción">
           </div>
         </div>
       </div>
@@ -515,8 +506,6 @@
           <div class="times"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
         </div>
       </div>
-      <p class="player-hint">Si no suena, elige un MP3 de tu computadora. Para dejarla fija, guarda el archivo en la carpeta <strong>audio/Puente.mp3</strong>.</p>
-      <label class="file-pick">Elegir canción <input type="file" id="songFile" accept="audio/*"></label>
     </div>
   </section>
 
@@ -571,7 +560,6 @@
   const currentTimeEl = document.getElementById('currentTime');
   const durationEl = document.getElementById('duration');
   const trackName = document.getElementById('trackName');
-  const songFile = document.getElementById('songFile');
   const jukeboxImg = document.getElementById('jukeboxImg');
   let seeking = false;
 
@@ -583,10 +571,13 @@
   }
 
   playBtn.addEventListener('click', () => {
-    if (song.paused) song.play().catch(() => {
-      trackName.textContent = 'Elige un MP3 para reproducir';
-    });
-    else song.pause();
+    if (song.paused) {
+      song.play().catch(() => {
+        trackName.textContent = 'Audio no disponible';
+      });
+    } else {
+      song.pause();
+    }
   });
 
   song.addEventListener('play', () => { 
@@ -606,25 +597,12 @@
     }
     currentTimeEl.textContent = fmt(song.currentTime);
   });
-  song.addEventListener('error', () => {
-    if (!song.src.startsWith('blob:')) {
-      trackName.textContent = 'No se encontró audio/Puente.mp3';
-    }
-  });
 
   progress.addEventListener('input', () => {
     seeking = true;
     if (song.duration) song.currentTime = (progress.value / 100) * song.duration;
   });
   progress.addEventListener('change', () => { seeking = false; });
-
-  songFile.addEventListener('change', () => {
-    const file = songFile.files[0];
-    if (!file) return;
-    song.src = URL.createObjectURL(file);
-    trackName.textContent = file.name.replace(/\.[^.]+$/, '');
-    song.play();
-  });
 </script>
 
 </body>
